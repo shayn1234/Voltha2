@@ -1,0 +1,68 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/4.3.1/types.yaml
+  - plugin:cloudify-utilities-plugin
+
+inputs:
+  pod_a_infra: 
+    default: kubernetes
+  pod_a_voltha: 
+    default: voltha
+  pod_b_infra:
+    default: kubernetes
+  pod_b_voltha: 
+    default: voltha
+
+node_templates:
+
+  poda_infra_deployment_proxy:
+    type: cloudify.nodes.DeploymentProxy
+    properties:
+      resource_config:
+        blueprint:
+          id: { get_input: pod_a_infra }
+          external_resource: true
+        deployment:
+          id: { get_input: pod_a_infra }
+          external_resource: true
+        reexecute: false 
+          
+  poda_voltha_deployment_proxy:
+    type: cloudify.nodes.DeploymentProxy
+    properties:
+      resource_config:
+        blueprint:
+          id: { get_input: pod_a_voltha }
+          external_resource: true
+        deployment:
+          id: { get_input: pod_a_voltha }
+          external_resource: true
+        reexecute: false 
+          
+  podb_infra_deployment_proxy:
+    type: cloudify.nodes.DeploymentProxy
+    properties:
+      resource_config:
+        blueprint:
+          id: { get_input: pod_b_infra }
+          external_resource: true
+        deployment:
+          id: { get_input: pod_b_infra }
+          external_resource: true
+          
+  podb_voltha_deployment_proxy:
+    type: cloudify.nodes.DeploymentProxy
+    properties:
+      resource_config:
+        blueprint:
+          id: { get_input: pod_b_voltha }
+          external_resource: true
+        deployment:
+          id: { get_input: pod_b_voltha }
+          external_resource: true
+groups:
+  poda:
+    members: [poda_infra_deployment_proxy, poda_voltha_deployment_proxy]
+  podb:
+    members: [podb_infra_deployment_proxy, podb_voltha_deployment_proxy]      
